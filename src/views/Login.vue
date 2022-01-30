@@ -26,6 +26,8 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 import {
   IonPage,
   IonHeader,
@@ -63,32 +65,36 @@ export default defineComponent({
         const { value: email, errorMessage: emailError } = useField('email');
         const { value: password, errorMessage: passwordError } = useField('password');
 
+        const store = useStore();
+        const router = useRouter();
+
+        function submitForm() {
+            console.log("Form submited", email, password);
+            
+            httpClient
+            .post("login_check", {
+                username: email.value,
+                password: password.value,
+            })
+            // .then((res: any) => res.data)
+            .then((res: any) => {
+            console.log("response", res);
+            store.commit('setToken', {token: res.token});
+            // localStorage.setItem("token", res.token);
+            router.push("/");
+            })
+            .catch((err: any) => {
+            console.error("Error", err);
+            });
+        }
+
         return {
+            submitForm,
             meta,
             email,
             emailError,
             password,
             passwordError
-        }
-    },
-    methods: {
-        submitForm() {
-            console.log("Form submited");
-            httpClient
-            .post("login_check", {
-                username: this.email,
-                password: this.password,
-            })
-            // .then((res: any) => res.data)
-            .then((res: any) => {
-            console.log("response", res);
-            // this.$store.commit('setToken', {token: res.token});
-            localStorage.setItem("token", res.token);
-            this.$router.push("/");
-            })
-            .catch((err: any) => {
-            console.error("Error", err);
-            });
         }
     }
 });

@@ -19,7 +19,7 @@ class http {
         })
 
         this.client.interceptors.response.use(res => res.data, error => {
-            console.log('Error fron interceptor: ');
+            console.log('Error fron interceptor: ', error);
             let is401 = false;
             if (!error.response) {
                 is401 = error.response.status === 401;
